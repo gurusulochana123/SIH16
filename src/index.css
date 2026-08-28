@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/* Custom Global Overrides & Leaflet Styling */
+@layer utilities {
+  /* Scrollbar overrides */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+}
+
+/* Custom scrollbar for dark elements */
+.dark-scrollbar::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+.dark-scrollbar::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+.dark-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Leaflet dark theme map and coordinate layout */
+.leaflet-container {
+  background: #0f172a !important;
+  border-radius: 0.5rem;
+}
+
+/* Premium popups for Leaflet */
+.leaflet-popup-content-wrapper {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-popup-tip {
+  background: #1e293b !important;
+}
+
+/* Custom div icon marker for maps */
+.custom-leaflet-marker {
+  background: transparent;
+  border: none;
+}
