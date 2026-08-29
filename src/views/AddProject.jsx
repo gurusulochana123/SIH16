@@ -1,278 +1,257 @@
 import React, { useState } from "react";
 import { ChevronRight, CheckCircle2, Upload, FileText } from "lucide-react";
 
-const STATES = ["Andhra Pradesh", "Telangana", "Maharashtra", "Karnataka", "Tamil Nadu", "Gujarat", "Rajasthan", "Uttar Pradesh", "Bihar", "Madhya Pradesh"];
-const TYPES  = ["Highway", "Railway", "Urban Transit", "Industrial", "Irrigation", "Renewable Energy", "Defense", "Urban Development"];
-const AGENCIES = ["NHAI", "DFCCIL", "HMDA", "TSIIC", "KIADB", "SECI", "MSEDCL", "Airport Authority of India", "Ministry of Jal Shakti"];
+const STATES = ["Andhra Pradesh","Telangana","Maharashtra","Karnataka","Tamil Nadu","Gujarat","Rajasthan","Uttar Pradesh","Bihar","Madhya Pradesh"];
+const TYPES   = ["Highway","Railway","Urban Transit","Industrial","Irrigation","Renewable Energy","Defense","Urban Development"];
+const STEPS   = [{ num:1,label:"Project Details" },{ num:2,label:"Land & Families" },{ num:3,label:"Documents & Submit" }];
 
-const STEPS = [
-  { num: 1, label: "Project Details" },
-  { num: 2, label: "Land & Families" },
-  { num: 3, label: "Documents & Submit" },
-];
+const card = { background:"#0f0f24", borderRadius:"16px", border:"1px solid rgba(167,139,250,0.12)", boxShadow:"0 4px 24px rgba(0,0,0,0.4)" };
+const inputStyle = { width:"100%", border:"1px solid rgba(167,139,250,0.2)", borderRadius:"12px", padding:"10px 14px", fontSize:"13px", background:"rgba(167,139,250,0.05)", outline:"none", transition:"all 0.2s", boxSizing:"border-box", color:"rgba(255,255,255,0.88)", fontFamily:"inherit" };
+const labelStyle = { display:"block", fontSize:"10px", fontWeight:700, color:"rgba(167,139,250,0.55)", textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:"6px" };
 
 export default function AddProject({ onSubmit, onCancel }) {
   const [step, setStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({
-    // Step 1
-    name: "", type: "Highway", state: "Andhra Pradesh", district: "",
-    requiringBody: "", ministry: "", agency: "",
-    // Step 2
-    landRequired: "", parcels: "", affectedFamilies: "", estimatedComp: "",
-    priority: "High",
-    // Step 3
-    dprUploaded: false, siaUploaded: false, mapUploaded: false,
-    agreedTerms: false,
+    name:"", type:"Highway", state:"Andhra Pradesh", district:"", requiringBody:"", ministry:"", agency:"",
+    landRequired:"", parcels:"", affectedFamilies:"", estimatedComp:"", priority:"High",
+    dprUploaded:false, siaUploaded:false, mapUploaded:false, agreedTerms:false,
   });
   const [errors, setErrors] = useState({});
 
-  const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
+  const set = (key, val) => setForm(f=>({...f,[key]:val}));
 
   const validateStep1 = () => {
     const e = {};
-    if (!form.name.trim())        e.name        = "Project name is required";
-    if (!form.district.trim())    e.district    = "District is required";
-    if (!form.requiringBody.trim()) e.requiringBody = "Requiring body is required";
-    if (!form.ministry.trim())    e.ministry    = "Ministry is required";
-    if (!form.agency.trim())      e.agency      = "Implementing agency is required";
-    setErrors(e);
-    return Object.keys(e).length === 0;
+    if (!form.name.trim())            e.name          = "Project name is required";
+    if (!form.district.trim())        e.district      = "District is required";
+    if (!form.requiringBody.trim())   e.requiringBody = "Requiring body is required";
+    if (!form.ministry.trim())        e.ministry      = "Ministry is required";
+    if (!form.agency.trim())          e.agency        = "Implementing agency is required";
+    setErrors(e); return Object.keys(e).length===0;
   };
-
   const validateStep2 = () => {
     const e = {};
-    if (!form.landRequired || isNaN(+form.landRequired)) e.landRequired = "Enter a valid acreage";
-    if (!form.parcels || isNaN(+form.parcels))           e.parcels      = "Enter a valid number";
-    if (!form.affectedFamilies || isNaN(+form.affectedFamilies)) e.affectedFamilies = "Enter a valid number";
-    if (!form.estimatedComp || isNaN(+form.estimatedComp))       e.estimatedComp    = "Enter a valid amount";
-    setErrors(e);
-    return Object.keys(e).length === 0;
+    if (!form.landRequired||isNaN(+form.landRequired))         e.landRequired     = "Enter a valid acreage";
+    if (!form.parcels||isNaN(+form.parcels))                   e.parcels          = "Enter a valid number";
+    if (!form.affectedFamilies||isNaN(+form.affectedFamilies)) e.affectedFamilies = "Enter a valid number";
+    if (!form.estimatedComp||isNaN(+form.estimatedComp))       e.estimatedComp    = "Enter a valid amount";
+    setErrors(e); return Object.keys(e).length===0;
   };
 
   const nextStep = () => {
-    if (step === 1 && !validateStep1()) return;
-    if (step === 2 && !validateStep2()) return;
-    setStep(s => s + 1);
+    if (step===1 && !validateStep1()) return;
+    if (step===2 && !validateStep2()) return;
+    setStep(s=>s+1);
   };
 
   const handleSubmit = () => {
     if (!form.agreedTerms) { alert("Please agree to the declaration to submit."); return; }
     setSubmitted(true);
-    setTimeout(() => {
+    setTimeout(()=>{
       onSubmit({
-        id: `PRJ-NEW-${Date.now()}`,
-        name: form.name,
-        shortName: form.name.slice(0, 8).toUpperCase().replace(/\s/g, "-"),
-        type: form.type,
-        state: form.state,
-        district: form.district,
-        requiringBody: form.requiringBody,
-        ministry: form.ministry,
-        implementingAgency: form.agency,
-        priority: form.priority,
-        landProposedAcres: +form.landRequired,
-        landAcquiredAcres: 0,
-        progressPercentage: 0,
-        compensationAssessedCr: +form.estimatedComp,
-        compensationPaidCr: 0,
-        affectedFamiliesCount: +form.affectedFamilies,
-        displacedFamiliesCount: 0,
-        rrCompletedCount: 0,
-        overallStatus: "On Track",
-        workflowStages: [
-          { name: "Proposal Submitted",    status: "completed",  date: new Date().toISOString().slice(0, 10), authority: form.agency, remarks: "Proposal submitted via NLAMS portal" },
-          { name: "District Verification", status: "pending", date: null, authority: `Collector, ${form.district}`, remarks: "" },
-          { name: "State Approval",        status: "pending", date: null, authority: `Govt. of ${form.state}`, remarks: "" },
-          { name: "Notification (Sec 11)", status: "pending", date: null, authority: "District Collector", remarks: "" },
-          { name: "Land Survey",           status: "pending", date: null, authority: "Survey Department", remarks: "" },
-          { name: "Award Declaration",     status: "pending", date: null, authority: "LAC", remarks: "" },
-          { name: "Compensation Payment",  status: "pending", date: null, authority: "Treasury", remarks: "" },
-          { name: "Land Possession",       status: "pending", date: null, authority: "District Collector", remarks: "" },
-          { name: "R&R Completion",        status: "pending", date: null, authority: "SLAO", remarks: "" },
-          { name: "Project Completed",     status: "pending", date: null, authority: "Ministry", remarks: "" },
+        id:`PRJ-NEW-${Date.now()}`, name:form.name,
+        shortName:form.name.slice(0,8).toUpperCase().replace(/\s/g,"-"),
+        type:form.type, state:form.state, district:form.district,
+        requiringBody:form.requiringBody, ministry:form.ministry, implementingAgency:form.agency, priority:form.priority,
+        landProposedAcres:+form.landRequired, landAcquiredAcres:0, progressPercentage:0,
+        compensationAssessedCr:+form.estimatedComp, compensationPaidCr:0,
+        affectedFamiliesCount:+form.affectedFamilies, displacedFamiliesCount:0, rrCompletedCount:0,
+        overallStatus:"On Track",
+        workflowStages:[
+          { name:"Proposal Submitted",    status:"completed", date:new Date().toISOString().slice(0,10), authority:form.agency, remarks:"Proposal submitted via NLAMS portal" },
+          { name:"District Verification", status:"pending", date:null, authority:`Collector, ${form.district}`, remarks:"" },
+          { name:"State Approval",        status:"pending", date:null, authority:`Govt. of ${form.state}`, remarks:"" },
+          { name:"Notification (Sec 11)", status:"pending", date:null, authority:"District Collector", remarks:"" },
+          { name:"Land Survey",           status:"pending", date:null, authority:"Survey Department", remarks:"" },
+          { name:"Award Declaration",     status:"pending", date:null, authority:"LAC", remarks:"" },
+          { name:"Compensation Payment",  status:"pending", date:null, authority:"Treasury", remarks:"" },
+          { name:"Land Possession",       status:"pending", date:null, authority:"District Collector", remarks:"" },
+          { name:"R&R Completion",        status:"pending", date:null, authority:"SLAO", remarks:"" },
+          { name:"Project Completed",     status:"pending", date:null, authority:"Ministry", remarks:"" },
         ],
-        lifecycleBreakdown: { notifications: 0, awards: 0, compensation: 0, rr: 0, possession: 0 },
-        attentionRequired: { compensationDelay: 0, documentMismatch: 0, rrPending: 0, milestoneApproaching: +form.parcels },
-        parcels: [],
-        documents: [],
-        auditTrail: [{ id: `AUD-NEW-01`, timestamp: new Date().toLocaleString(), user: "System", action: "Proposal submitted via NLAMS online portal" }],
+        lifecycleBreakdown:{notifications:0,awards:0,compensation:0,rr:0,possession:0},
+        attentionRequired:{compensationDelay:0,documentMismatch:0,rrPending:0,milestoneApproaching:+form.parcels},
+        parcels:[], documents:[],
+        auditTrail:[{id:`AUD-NEW-01`,timestamp:new Date().toLocaleString(),user:"System",action:"Proposal submitted via NLAMS online portal"}],
       });
-    }, 600);
+    },600);
   };
 
   if (submitted) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
-        <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center">
-          <CheckCircle2 className="text-emerald-600 w-12 h-12" />
+      <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", minHeight:"60vh", gap:"24px" }}>
+        <div style={{ width:"88px", height:"88px", background:"rgba(16,185,129,0.15)", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 0 40px rgba(16,185,129,0.3)", border:"2px solid rgba(16,185,129,0.4)" }}>
+          <CheckCircle2 style={{ color:"#34d399", width:"44px", height:"44px" }}/>
         </div>
-        <div className="text-center">
-          <h2 className="text-2xl font-black text-slate-900 mb-2">Proposal Submitted Successfully!</h2>
-          <p className="text-slate-500 text-sm max-w-md">
-            Your project proposal for <strong>"{form.name}"</strong> has been submitted. Status: <span className="text-amber-600 font-bold">Pending District Verification</span>. You will be notified once the district authority reviews the proposal.
+        <div style={{ textAlign:"center" }}>
+          <h2 style={{ fontSize:"22px", fontWeight:900, color:"rgba(255,255,255,0.92)", marginBottom:"8px" }}>Proposal Submitted Successfully!</h2>
+          <p style={{ fontSize:"13px", color:"rgba(167,139,250,0.6)", maxWidth:"420px" }}>
+            Your project proposal for <strong style={{color:"rgba(255,255,255,0.85)"}}>"{form.name}"</strong> has been submitted.
+            Status: <span style={{color:"#fbbf24",fontWeight:700}}>Pending District Verification</span>.
           </p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-6 w-full max-w-md text-xs">
-          <p className="font-bold text-slate-500 uppercase tracking-wider mb-3">Submission Summary</p>
-          <div className="flex flex-col gap-2 text-slate-700">
-            <div className="flex justify-between"><span>Project Name</span><strong>{form.name}</strong></div>
-            <div className="flex justify-between"><span>Type</span><strong>{form.type}</strong></div>
-            <div className="flex justify-between"><span>State / District</span><strong>{form.state} / {form.district}</strong></div>
-            <div className="flex justify-between"><span>Land Required</span><strong>{form.landRequired} acres</strong></div>
-            <div className="flex justify-between"><span>Affected Families</span><strong>{form.affectedFamilies}</strong></div>
-            <div className="flex justify-between"><span>Est. Compensation</span><strong>₹{form.estimatedComp} Cr</strong></div>
-            <div className="flex justify-between"><span>Status</span><strong className="text-amber-600">Pending Verification</strong></div>
+        <div style={{ ...card, padding:"20px", width:"100%", maxWidth:"420px", fontSize:"12px" }}>
+          <p style={{ fontWeight:700, color:"rgba(167,139,250,0.5)", textTransform:"uppercase", fontSize:"9px", letterSpacing:"0.12em", marginBottom:"12px" }}>Submission Summary</p>
+          <div style={{ display:"flex", flexDirection:"column", gap:"8px" }}>
+            {[
+              ["Project Name",form.name],["Type",form.type],[`State / District`,`${form.state} / ${form.district}`],
+              ["Land Required",`${form.landRequired} acres`],["Affected Families",form.affectedFamilies],
+              ["Est. Compensation",`₹${form.estimatedComp} Cr`],["Status","Pending Verification"],
+            ].map(([k,v],i)=>(
+              <div key={i} style={{ display:"flex", justifyContent:"space-between", color:"rgba(167,139,250,0.6)" }}>
+                <span>{k}</span>
+                <strong style={{color:k==="Status"?"#fbbf24":"rgba(255,255,255,0.88)"}}>{v}</strong>
+              </div>
+            ))}
           </div>
         </div>
-        <button onClick={onCancel} className="bg-slate-900 text-white font-bold px-6 py-2.5 rounded-xl cursor-pointer text-sm">
+        <button onClick={onCancel}
+          style={{ background:"linear-gradient(135deg,#5b21b6,#7c3aed)", color:"white", fontWeight:700, padding:"10px 24px", borderRadius:"14px", border:"none", cursor:"pointer", fontSize:"13px", boxShadow:"0 4px 16px rgba(124,58,237,0.4)" }}>
           Back to Projects
         </button>
       </div>
     );
   }
 
-  const ErrMsg = ({ field }) => errors[field] ? <p className="text-red-500 text-[10px] mt-1 font-semibold">{errors[field]}</p> : null;
+  const ErrMsg = ({field}) => errors[field]
+    ? <p style={{ color:"#f87171", fontSize:"10px", fontWeight:700, marginTop:"4px" }}>{errors[field]}</p>
+    : null;
+
+  const inputFocus = (e) => { e.target.style.borderColor="rgba(167,139,250,0.5)"; e.target.style.background="rgba(167,139,250,0.1)"; e.target.style.boxShadow="0 0 0 3px rgba(124,58,237,0.15)"; };
+  const inputBlur  = (e) => { e.target.style.borderColor="rgba(167,139,250,0.2)"; e.target.style.background="rgba(167,139,250,0.05)"; e.target.style.boxShadow="none"; };
 
   return (
-    <div className="flex flex-col gap-6 max-w-3xl mx-auto">
+    <div style={{ display:"flex", flexDirection:"column", gap:"16px", maxWidth:"760px", margin:"0 auto" }}>
+      <style>{`
+        .add-select option { background: #0f0f24; color: rgba(255,255,255,0.88); }
+      `}</style>
+
       {/* Header */}
-      <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">PROJECT MANAGEMENT</span>
-        <h2 className="text-lg font-black text-slate-900 mt-0.5">Submit New Project Proposal</h2>
-        <p className="text-xs text-slate-500">Complete all steps to submit a land acquisition proposal to NLAMS.</p>
+      <div style={{ ...card, padding:"20px" }}>
+        <div style={{ fontSize:"9px", fontWeight:800, color:"rgba(167,139,250,0.5)", textTransform:"uppercase", letterSpacing:"0.15em" }}>Project Management</div>
+        <h2 style={{ fontSize:"18px", fontWeight:900, color:"rgba(255,255,255,0.92)", margin:"2px 0 0" }}>Submit New Project Proposal</h2>
+        <p style={{ fontSize:"11px", color:"rgba(167,139,250,0.5)", marginTop:"2px" }}>Complete all steps to submit a land acquisition proposal to NLAMS.</p>
       </div>
 
       {/* Stepper */}
-      <div className="flex items-center gap-0">
-        {STEPS.map((s, i) => (
+      <div style={{ display:"flex", alignItems:"center", gap:"4px" }}>
+        {STEPS.map((s,i)=>(
           <React.Fragment key={s.num}>
-            <div className={`flex items-center gap-2 px-4 py-3 rounded-xl text-xs font-bold transition-all ${
-              step === s.num ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" :
-              step > s.num  ? "bg-emerald-100 text-emerald-800" : "bg-white border border-slate-200 text-slate-400"
-            }`}>
-              <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${
-                step > s.num ? "bg-emerald-500 text-white" : step === s.num ? "bg-white text-blue-600" : "bg-slate-200 text-slate-500"
-              }`}>
-                {step > s.num ? "✓" : s.num}
+            <div style={{ display:"flex", alignItems:"center", gap:"8px", padding:"9px 16px", borderRadius:"12px", fontSize:"12px", fontWeight:700, transition:"all 0.2s",
+              background:step===s.num?"linear-gradient(135deg,#5b21b6,#7c3aed)":step>s.num?"rgba(16,185,129,0.15)":"rgba(167,139,250,0.06)",
+              border:step===s.num?"none":step>s.num?"1px solid rgba(16,185,129,0.3)":"1px solid rgba(167,139,250,0.12)",
+              color:step===s.num?"white":step>s.num?"#34d399":"rgba(167,139,250,0.45)",
+              boxShadow:step===s.num?"0 4px 14px rgba(124,58,237,0.4)":"none" }}>
+              <div style={{ width:"20px", height:"20px", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"10px", fontWeight:900,
+                background:step>s.num?"#10b981":step===s.num?"rgba(255,255,255,0.2)":"rgba(167,139,250,0.1)",
+                color:step>s.num?"white":step===s.num?"white":"rgba(167,139,250,0.5)" }}>
+                {step>s.num?"✓":s.num}
               </div>
               {s.label}
             </div>
-            {i < STEPS.length - 1 && <ChevronRight size={16} className="text-slate-300 mx-1 shrink-0" />}
+            {i<STEPS.length-1 && <ChevronRight size={15} style={{ color:"rgba(167,139,250,0.25)", flexShrink:0 }}/>}
           </React.Fragment>
         ))}
       </div>
 
       {/* Form Content */}
-      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+      <div style={{ ...card, padding:"24px" }}>
 
         {/* STEP 1 */}
-        {step === 1 && (
-          <div className="flex flex-col gap-5">
-            <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-2">Step 1: Project Details</h3>
-
+        {step===1 && (
+          <div style={{ display:"flex", flexDirection:"column", gap:"18px" }}>
+            <h3 style={{ fontSize:"13px", fontWeight:700, color:"rgba(255,255,255,0.88)", borderBottom:"1px solid rgba(167,139,250,0.1)", paddingBottom:"10px", display:"flex", alignItems:"center", gap:"8px" }}>
+              <span style={{ width:"4px", height:"16px", background:"linear-gradient(#a78bfa,#7c3aed)", borderRadius:"2px", display:"inline-block" }}/>
+              Step 1: Project Details
+            </h3>
             <div>
-              <label className="label-xs">Project Name *</label>
-              <input type="text" value={form.name} onChange={e => set("name", e.target.value)}
-                placeholder="e.g. National Highway AP-01 Extension" className="input-field" />
-              <ErrMsg field="name" />
+              <label style={labelStyle}>Project Name *</label>
+              <input type="text" value={form.name} onChange={e=>set("name",e.target.value)} placeholder="e.g. National Highway AP-01 Extension" style={inputStyle} onFocus={inputFocus} onBlur={inputBlur} className="add-select"/>
+              <ErrMsg field="name"/>
             </div>
-
-            <div className="grid grid-cols-2 gap-4">
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"14px" }}>
               <div>
-                <label className="label-xs">Project Type *</label>
-                <select value={form.type} onChange={e => set("type", e.target.value)} className="input-field">
-                  {TYPES.map(t => <option key={t}>{t}</option>)}
+                <label style={labelStyle}>Project Type *</label>
+                <select value={form.type} onChange={e=>set("type",e.target.value)} style={inputStyle} className="add-select" onFocus={inputFocus} onBlur={inputBlur}>
+                  {TYPES.map(t=><option key={t}>{t}</option>)}
                 </select>
               </div>
               <div>
-                <label className="label-xs">Priority</label>
-                <select value={form.priority} onChange={e => set("priority", e.target.value)} className="input-field">
-                  {["High", "Medium", "Low"].map(t => <option key={t}>{t}</option>)}
+                <label style={labelStyle}>Priority</label>
+                <select value={form.priority} onChange={e=>set("priority",e.target.value)} style={inputStyle} className="add-select" onFocus={inputFocus} onBlur={inputBlur}>
+                  {["High","Medium","Low"].map(t=><option key={t}>{t}</option>)}
                 </select>
               </div>
             </div>
-
-            <div className="grid grid-cols-2 gap-4">
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"14px" }}>
               <div>
-                <label className="label-xs">State *</label>
-                <select value={form.state} onChange={e => set("state", e.target.value)} className="input-field">
-                  {STATES.map(s => <option key={s}>{s}</option>)}
+                <label style={labelStyle}>State *</label>
+                <select value={form.state} onChange={e=>set("state",e.target.value)} style={inputStyle} className="add-select" onFocus={inputFocus} onBlur={inputBlur}>
+                  {STATES.map(s=><option key={s}>{s}</option>)}
                 </select>
               </div>
               <div>
-                <label className="label-xs">District *</label>
-                <input type="text" value={form.district} onChange={e => set("district", e.target.value)}
-                  placeholder="e.g. Kurnool" className="input-field" />
-                <ErrMsg field="district" />
+                <label style={labelStyle}>District *</label>
+                <input type="text" value={form.district} onChange={e=>set("district",e.target.value)} placeholder="e.g. Kurnool" style={inputStyle} onFocus={inputFocus} onBlur={inputBlur}/>
+                <ErrMsg field="district"/>
               </div>
             </div>
-
             <div>
-              <label className="label-xs">Land Requiring Body *</label>
-              <input type="text" value={form.requiringBody} onChange={e => set("requiringBody", e.target.value)}
-                placeholder="e.g. NHAI, DFCCIL, HMDA..." className="input-field" />
-              <ErrMsg field="requiringBody" />
+              <label style={labelStyle}>Land Requiring Body *</label>
+              <input type="text" value={form.requiringBody} onChange={e=>set("requiringBody",e.target.value)} placeholder="e.g. NHAI, DFCCIL, HMDA..." style={inputStyle} onFocus={inputFocus} onBlur={inputBlur}/>
+              <ErrMsg field="requiringBody"/>
             </div>
-
             <div>
-              <label className="label-xs">Sponsoring Ministry *</label>
-              <input type="text" value={form.ministry} onChange={e => set("ministry", e.target.value)}
-                placeholder="e.g. Ministry of Road Transport & Highways" className="input-field" />
-              <ErrMsg field="ministry" />
+              <label style={labelStyle}>Sponsoring Ministry *</label>
+              <input type="text" value={form.ministry} onChange={e=>set("ministry",e.target.value)} placeholder="e.g. Ministry of Road Transport & Highways" style={inputStyle} onFocus={inputFocus} onBlur={inputBlur}/>
+              <ErrMsg field="ministry"/>
             </div>
-
             <div>
-              <label className="label-xs">Implementing Agency *</label>
-              <input type="text" value={form.agency} onChange={e => set("agency", e.target.value)}
-                placeholder="e.g. NHAI Regional Office, Hyderabad" className="input-field" />
-              <ErrMsg field="agency" />
+              <label style={labelStyle}>Implementing Agency *</label>
+              <input type="text" value={form.agency} onChange={e=>set("agency",e.target.value)} placeholder="e.g. NHAI Regional Office, Hyderabad" style={inputStyle} onFocus={inputFocus} onBlur={inputBlur}/>
+              <ErrMsg field="agency"/>
             </div>
           </div>
         )}
 
         {/* STEP 2 */}
-        {step === 2 && (
-          <div className="flex flex-col gap-5">
-            <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-2">Step 2: Land & Family Details</h3>
-
-            <div className="grid grid-cols-2 gap-4">
+        {step===2 && (
+          <div style={{ display:"flex", flexDirection:"column", gap:"18px" }}>
+            <h3 style={{ fontSize:"13px", fontWeight:700, color:"rgba(255,255,255,0.88)", borderBottom:"1px solid rgba(167,139,250,0.1)", paddingBottom:"10px", display:"flex", alignItems:"center", gap:"8px" }}>
+              <span style={{ width:"4px", height:"16px", background:"linear-gradient(#fbbf24,#f97316)", borderRadius:"2px", display:"inline-block" }}/>
+              Step 2: Land & Family Details
+            </h3>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"14px" }}>
               <div>
-                <label className="label-xs">Total Land Required (Acres) *</label>
-                <input type="number" value={form.landRequired} onChange={e => set("landRequired", e.target.value)}
-                  placeholder="e.g. 1250" className="input-field" min="1" />
-                <ErrMsg field="landRequired" />
+                <label style={labelStyle}>Total Land Required (Acres) *</label>
+                <input type="number" value={form.landRequired} onChange={e=>set("landRequired",e.target.value)} placeholder="e.g. 1250" style={inputStyle} min="1" onFocus={inputFocus} onBlur={inputBlur}/>
+                <ErrMsg field="landRequired"/>
               </div>
               <div>
-                <label className="label-xs">Number of Land Parcels *</label>
-                <input type="number" value={form.parcels} onChange={e => set("parcels", e.target.value)}
-                  placeholder="e.g. 45" className="input-field" min="1" />
-                <ErrMsg field="parcels" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="label-xs">Total Affected Families *</label>
-                <input type="number" value={form.affectedFamilies} onChange={e => set("affectedFamilies", e.target.value)}
-                  placeholder="e.g. 24" className="input-field" min="0" />
-                <ErrMsg field="affectedFamilies" />
-              </div>
-              <div>
-                <label className="label-xs">Estimated Compensation (₹ Crore) *</label>
-                <input type="number" value={form.estimatedComp} onChange={e => set("estimatedComp", e.target.value)}
-                  placeholder="e.g. 850" className="input-field" min="0" />
-                <ErrMsg field="estimatedComp" />
+                <label style={labelStyle}>Number of Land Parcels *</label>
+                <input type="number" value={form.parcels} onChange={e=>set("parcels",e.target.value)} placeholder="e.g. 45" style={inputStyle} min="1" onFocus={inputFocus} onBlur={inputBlur}/>
+                <ErrMsg field="parcels"/>
               </div>
             </div>
-
-            {/* Summary preview */}
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"14px" }}>
+              <div>
+                <label style={labelStyle}>Total Affected Families *</label>
+                <input type="number" value={form.affectedFamilies} onChange={e=>set("affectedFamilies",e.target.value)} placeholder="e.g. 24" style={inputStyle} min="0" onFocus={inputFocus} onBlur={inputBlur}/>
+                <ErrMsg field="affectedFamilies"/>
+              </div>
+              <div>
+                <label style={labelStyle}>Estimated Compensation (₹ Crore) *</label>
+                <input type="number" value={form.estimatedComp} onChange={e=>set("estimatedComp",e.target.value)} placeholder="e.g. 850" style={inputStyle} min="0" onFocus={inputFocus} onBlur={inputBlur}/>
+                <ErrMsg field="estimatedComp"/>
+              </div>
+            </div>
             {form.landRequired && form.affectedFamilies && (
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-xs">
-                <p className="font-bold text-blue-800 mb-2">📊 Quick Summary</p>
-                <div className="grid grid-cols-2 gap-2 text-blue-700">
-                  <span>Land Density: <strong>{(+form.landRequired / Math.max(+form.affectedFamilies, 1)).toFixed(1)} acres/family</strong></span>
-                  <span>Comp per Acre: <strong>₹{form.estimatedComp ? ((+form.estimatedComp * 100) / +form.landRequired).toFixed(1) : "—"} L</strong></span>
+              <div style={{ background:"rgba(124,58,237,0.1)", border:"1px solid rgba(167,139,250,0.25)", borderRadius:"12px", padding:"14px 16px", fontSize:"12px", color:"rgba(196,181,253,0.8)" }}>
+                <p style={{ fontWeight:700, marginBottom:"6px", color:"#c4b5fd" }}>📊 Quick Summary</p>
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px" }}>
+                  <span>Land Density: <strong style={{color:"rgba(255,255,255,0.88)"}}>{(+form.landRequired/Math.max(+form.affectedFamilies,1)).toFixed(1)} acres/family</strong></span>
+                  <span>Comp per Acre: <strong style={{color:"rgba(255,255,255,0.88)"}}>₹{form.estimatedComp?((+form.estimatedComp*100)/+form.landRequired).toFixed(1):"—"} L</strong></span>
                 </div>
               </div>
             )}
@@ -280,63 +259,52 @@ export default function AddProject({ onSubmit, onCancel }) {
         )}
 
         {/* STEP 3 */}
-        {step === 3 && (
-          <div className="flex flex-col gap-5">
-            <h3 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-2">Step 3: Documents & Submit</h3>
-
-            <div className="flex flex-col gap-3">
+        {step===3 && (
+          <div style={{ display:"flex", flexDirection:"column", gap:"18px" }}>
+            <h3 style={{ fontSize:"13px", fontWeight:700, color:"rgba(255,255,255,0.88)", borderBottom:"1px solid rgba(167,139,250,0.1)", paddingBottom:"10px", display:"flex", alignItems:"center", gap:"8px" }}>
+              <span style={{ width:"4px", height:"16px", background:"linear-gradient(#34d399,#10b981)", borderRadius:"2px", display:"inline-block" }}/>
+              Step 3: Documents & Submit
+            </h3>
+            <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
               {[
-                { key: "dprUploaded",  label: "Detailed Project Report (DPR)",      req: true  },
-                { key: "siaUploaded",  label: "Social Impact Assessment (SIA)",      req: true  },
-                { key: "mapUploaded",  label: "Cadastral / Land Boundary Maps",      req: false },
-              ].map(doc => (
-                <div key={doc.key} className="flex items-center justify-between p-4 border border-slate-200 rounded-xl bg-slate-50/50">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${form[doc.key] ? "bg-emerald-100" : "bg-slate-100"}`}>
-                      {form[doc.key] ? <CheckCircle2 size={18} className="text-emerald-600" /> : <FileText size={18} className="text-slate-400" />}
+                { key:"dprUploaded", label:"Detailed Project Report (DPR)", req:true  },
+                { key:"siaUploaded", label:"Social Impact Assessment (SIA)", req:true  },
+                { key:"mapUploaded", label:"Cadastral / Land Boundary Maps",  req:false },
+              ].map(doc=>(
+                <div key={doc.key} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 16px", border:`1px solid ${form[doc.key]?"rgba(16,185,129,0.3)":"rgba(167,139,250,0.12)"}`, borderRadius:"13px", background:form[doc.key]?"rgba(16,185,129,0.06)":"rgba(167,139,250,0.04)", transition:"all 0.2s" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:"12px" }}>
+                    <div style={{ width:"36px", height:"36px", borderRadius:"10px", display:"flex", alignItems:"center", justifyContent:"center", background:form[doc.key]?"rgba(16,185,129,0.15)":"rgba(167,139,250,0.1)", border:`1px solid ${form[doc.key]?"rgba(16,185,129,0.3)":"rgba(167,139,250,0.15)"}` }}>
+                      {form[doc.key]
+                        ? <CheckCircle2 size={17} style={{color:"#34d399"}}/>
+                        : <FileText size={17} style={{color:"rgba(167,139,250,0.5)"}}/>}
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-slate-800">{doc.label}</p>
-                      <p className="text-[10px] text-slate-400">{doc.req ? "Required" : "Optional"}</p>
+                      <p style={{ fontSize:"12px", fontWeight:700, color:"rgba(255,255,255,0.85)" }}>{doc.label}</p>
+                      <p style={{ fontSize:"10px", color:"rgba(167,139,250,0.45)" }}>{doc.req?"Required":"Optional"}</p>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => set(doc.key, !form[doc.key])}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold cursor-pointer transition-all ${
-                      form[doc.key] ? "bg-emerald-100 text-emerald-800 border border-emerald-200" : "bg-slate-900 text-white hover:bg-blue-600"
-                    }`}
-                  >
-                    {form[doc.key] ? <><CheckCircle2 size={12} /> Uploaded</> : <><Upload size={12} /> Upload</>}
+                  <button type="button" onClick={()=>set(doc.key,!form[doc.key])}
+                    style={{ display:"flex", alignItems:"center", gap:"6px", padding:"7px 14px", borderRadius:"10px", fontSize:"11px", fontWeight:700, cursor:"pointer", transition:"all 0.15s", border:`1px solid ${form[doc.key]?"rgba(16,185,129,0.4)":"rgba(167,139,250,0.3)"}`, background:form[doc.key]?"rgba(16,185,129,0.15)":"rgba(124,58,237,0.2)", color:form[doc.key]?"#34d399":"#c4b5fd" }}>
+                    {form[doc.key] ? <><CheckCircle2 size={12}/> Uploaded</> : <><Upload size={12}/> Upload</>}
                   </button>
                 </div>
               ))}
             </div>
 
             {/* Review Summary */}
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs">
-              <p className="font-bold text-slate-700 mb-3 uppercase tracking-wider">Proposal Review Summary</p>
-              <div className="grid grid-cols-2 gap-2 text-slate-600">
-                <span>Name: <strong className="text-slate-800">{form.name || "—"}</strong></span>
-                <span>Type: <strong className="text-slate-800">{form.type}</strong></span>
-                <span>State: <strong className="text-slate-800">{form.state}</strong></span>
-                <span>District: <strong className="text-slate-800">{form.district || "—"}</strong></span>
-                <span>Land: <strong className="text-slate-800">{form.landRequired || "—"} acres</strong></span>
-                <span>Families: <strong className="text-slate-800">{form.affectedFamilies || "—"}</strong></span>
-                <span>Est. Comp: <strong className="text-slate-800">₹{form.estimatedComp || "—"} Cr</strong></span>
-                <span>Priority: <strong className="text-slate-800">{form.priority}</strong></span>
+            <div style={{ background:"rgba(167,139,250,0.05)", border:"1px solid rgba(167,139,250,0.12)", borderRadius:"13px", padding:"16px", fontSize:"12px" }}>
+              <p style={{ fontWeight:700, color:"rgba(167,139,250,0.55)", textTransform:"uppercase", fontSize:"9px", letterSpacing:"0.12em", marginBottom:"12px" }}>Proposal Review Summary</p>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px", color:"rgba(167,139,250,0.6)" }}>
+                {[["Name",form.name||"—"],["Type",form.type],["State",form.state],["District",form.district||"—"],["Land",`${form.landRequired||"—"} acres`],["Families",form.affectedFamilies||"—"],["Est. Comp",`₹${form.estimatedComp||"—"} Cr`],["Priority",form.priority]].map(([k,v])=>(
+                  <span key={k}>{k}: <strong style={{color:"rgba(255,255,255,0.85)"}}>{v}</strong></span>
+                ))}
               </div>
             </div>
 
             {/* Declaration */}
-            <label className="flex items-start gap-3 cursor-pointer bg-amber-50 border border-amber-200 rounded-xl p-4">
-              <input
-                type="checkbox"
-                checked={form.agreedTerms}
-                onChange={e => set("agreedTerms", e.target.checked)}
-                className="mt-0.5 w-4 h-4 accent-blue-600 cursor-pointer shrink-0"
-              />
-              <span className="text-[11px] text-amber-800 font-semibold leading-relaxed">
+            <label style={{ display:"flex", alignItems:"flex-start", gap:"12px", cursor:"pointer", background:"rgba(245,158,11,0.08)", border:"1px solid rgba(245,158,11,0.25)", borderRadius:"13px", padding:"14px 16px" }}>
+              <input type="checkbox" checked={form.agreedTerms} onChange={e=>set("agreedTerms",e.target.checked)} style={{ marginTop:"2px", width:"16px", height:"16px", accentColor:"#a78bfa", cursor:"pointer", flexShrink:0 }}/>
+              <span style={{ fontSize:"11px", color:"rgba(251,191,36,0.8)", fontWeight:600, lineHeight:1.6 }}>
                 I hereby declare that all information provided in this proposal is true and correct to the best of my knowledge, and the required land acquisition documents have been uploaded in accordance with RFCTLARR Act, 2013.
               </span>
             </label>
@@ -345,29 +313,29 @@ export default function AddProject({ onSubmit, onCancel }) {
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between gap-4">
-        <button
-          onClick={step === 1 ? onCancel : () => setStep(s => s - 1)}
-          className="px-5 py-2.5 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-100 cursor-pointer transition-colors"
-        >
-          {step === 1 ? "Cancel" : "← Back"}
+      <div style={{ display:"flex", justifyContent:"space-between", gap:"12px" }}>
+        <button onClick={step===1?onCancel:()=>setStep(s=>s-1)}
+          style={{ padding:"10px 20px", border:"1px solid rgba(167,139,250,0.2)", borderRadius:"12px", fontSize:"13px", fontWeight:700, color:"rgba(167,139,250,0.6)", background:"rgba(167,139,250,0.06)", cursor:"pointer", transition:"all 0.18s" }}
+          onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(167,139,250,0.4)";e.currentTarget.style.color="rgba(196,181,253,0.9)";}}
+          onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(167,139,250,0.2)";e.currentTarget.style.color="rgba(167,139,250,0.6)";}}>
+          {step===1?"Cancel":"← Back"}
         </button>
-        {step < 3 ? (
-          <button onClick={nextStep} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm cursor-pointer transition-all shadow-lg shadow-blue-600/20">
+        {step<3 ? (
+          <button onClick={nextStep}
+            style={{ padding:"10px 22px", background:"linear-gradient(135deg,#5b21b6,#7c3aed)", color:"white", fontWeight:700, borderRadius:"12px", border:"none", fontSize:"13px", cursor:"pointer", boxShadow:"0 4px 16px rgba(124,58,237,0.4)", transition:"all 0.2s" }}
+            onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 6px 24px rgba(167,139,250,0.5)";e.currentTarget.style.transform="translateY(-1px)";}}
+            onMouseLeave={e=>{e.currentTarget.style.boxShadow="0 4px 16px rgba(124,58,237,0.4)";e.currentTarget.style.transform="none";}}>
             Next Step →
           </button>
         ) : (
-          <button onClick={handleSubmit} className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm cursor-pointer transition-all shadow-lg shadow-emerald-600/20">
+          <button onClick={handleSubmit}
+            style={{ padding:"10px 22px", background:"linear-gradient(135deg,#065f46,#10b981)", color:"white", fontWeight:700, borderRadius:"12px", border:"none", fontSize:"13px", cursor:"pointer", boxShadow:"0 4px 16px rgba(16,185,129,0.4)", transition:"all 0.2s" }}
+            onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 6px 24px rgba(52,211,153,0.5)";e.currentTarget.style.transform="translateY(-1px)";}}
+            onMouseLeave={e=>{e.currentTarget.style.boxShadow="0 4px 16px rgba(16,185,129,0.4)";e.currentTarget.style.transform="none";}}>
             Submit Proposal ✓
           </button>
         )}
       </div>
-
-      <style>{`
-        .label-xs { display: block; font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-        .input-field { width: 100%; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 14px; font-size: 13px; background: #f8fafc; outline: none; transition: all 0.2s; box-sizing: border-box; }
-        .input-field:focus { border-color: #3b82f6; background: white; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-      `}</style>
     </div>
   );
 }

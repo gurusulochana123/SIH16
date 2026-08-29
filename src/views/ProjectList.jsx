@@ -1,21 +1,24 @@
 import React, { useState } from "react";
 import { Search, Filter, Eye, Plus, ChevronDown } from "lucide-react";
 
-const STATUS_COLORS = {
-  "Completed":  { bg: "bg-emerald-100", text: "text-emerald-800", border: "border-emerald-200" },
-  "On Track":   { bg: "bg-sky-100",     text: "text-sky-800",     border: "border-sky-200"     },
-  "Delayed":    { bg: "bg-amber-100",   text: "text-amber-800",   border: "border-amber-200"   },
-  "High Risk":  { bg: "bg-red-100",     text: "text-red-800",     border: "border-red-200"     },
+const STATUS_CFG = {
+  "Completed": { bg:"rgba(16,185,129,0.15)", text:"#34d399", border:"rgba(16,185,129,0.3)" },
+  "On Track":  { bg:"rgba(56,189,248,0.15)", text:"#38bdf8", border:"rgba(56,189,248,0.3)" },
+  "Delayed":   { bg:"rgba(245,158,11,0.15)", text:"#fbbf24", border:"rgba(245,158,11,0.3)" },
+  "High Risk": { bg:"rgba(239,68,68,0.15)",  text:"#f87171", border:"rgba(239,68,68,0.3)"  },
+};
+const TYPE_CFG = {
+  "Highway":          { bg:"rgba(99,102,241,0.15)",  text:"#a78bfa" },
+  "Railway":          { bg:"rgba(167,139,250,0.15)", text:"#c4b5fd" },
+  "Urban Transit":    { bg:"rgba(56,189,248,0.15)",  text:"#7dd3fc" },
+  "Industrial":       { bg:"rgba(251,146,60,0.15)",  text:"#fb923c" },
+  "Irrigation":       { bg:"rgba(20,184,166,0.15)",  text:"#2dd4bf" },
+  "Renewable Energy": { bg:"rgba(74,222,128,0.15)",  text:"#4ade80" },
 };
 
-const TYPE_COLORS = {
-  "Highway":         "bg-indigo-100 text-indigo-800",
-  "Railway":         "bg-purple-100 text-purple-800",
-  "Urban Transit":   "bg-blue-100 text-blue-800",
-  "Industrial":      "bg-orange-100 text-orange-800",
-  "Irrigation":      "bg-teal-100 text-teal-800",
-  "Renewable Energy":"bg-green-100 text-green-800",
-};
+const card = { background:"#0f0f24", borderRadius:"16px", border:"1px solid rgba(167,139,250,0.12)", boxShadow:"0 4px 24px rgba(0,0,0,0.4)" };
+const inputS = { border:"1px solid rgba(167,139,250,0.2)", borderRadius:"10px", padding:"7px 12px", fontSize:"12px", background:"rgba(167,139,250,0.05)", color:"rgba(255,255,255,0.85)", outline:"none", fontFamily:"inherit", width:"100%", boxSizing:"border-box" };
+const selectS = { ...inputS, width:"auto", cursor:"pointer" };
 
 export default function ProjectList({ projects, onViewDetails, onAddProject }) {
   const [search, setSearch]           = useState("");
@@ -36,138 +39,115 @@ export default function ProjectList({ projects, onViewDetails, onAddProject }) {
   });
 
   return (
-    <div className="flex flex-col gap-6">
+    <div style={{ display:"flex", flexDirection:"column", gap:"16px" }}>
       {/* Header */}
-      <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div style={{ ...card, padding:"20px", display:"flex", flexDirection:"row", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:"12px" }}>
         <div>
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">PROJECT MANAGEMENT</span>
-          <h2 className="text-lg font-black text-slate-900 mt-0.5">All Projects</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Showing {filtered.length} of {projects.length} projects across all states</p>
+          <div style={{ fontSize:"9px", fontWeight:800, color:"rgba(167,139,250,0.5)", textTransform:"uppercase", letterSpacing:"0.15em" }}>Project Management</div>
+          <h2 style={{ fontSize:"18px", fontWeight:900, color:"rgba(255,255,255,0.92)", margin:"2px 0 0" }}>All Projects</h2>
+          <p style={{ fontSize:"11px", color:"rgba(167,139,250,0.5)", marginTop:"2px" }}>Showing {filtered.length} of {projects.length} projects</p>
         </div>
-        <button
-          onClick={onAddProject}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer text-sm shadow-lg shadow-blue-600/20"
-        >
-          <Plus size={16} /> Add New Project
+        <button onClick={onAddProject}
+          style={{ display:"flex", alignItems:"center", gap:"8px", background:"linear-gradient(135deg,#5b21b6,#7c3aed)", color:"white", fontWeight:700, padding:"9px 18px", borderRadius:"12px", border:"none", cursor:"pointer", fontSize:"13px", boxShadow:"0 4px 16px rgba(124,58,237,0.4)", transition:"all 0.2s" }}
+          onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 6px 24px rgba(167,139,250,0.5)";e.currentTarget.style.transform="translateY(-1px)";}}
+          onMouseLeave={e=>{e.currentTarget.style.boxShadow="0 4px 16px rgba(124,58,237,0.4)";e.currentTarget.style.transform="none";}}>
+          <Plus size={16}/> Add New Project
         </button>
       </div>
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row gap-3 items-start sm:items-center flex-wrap">
-        <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-          <Search size={16} className="text-slate-400 shrink-0" />
-          <input
-            type="text"
-            placeholder="Search by project name or ID..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="flex-1 text-xs border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"
+      <div style={{ ...card, padding:"14px 18px", display:"flex", alignItems:"center", gap:"12px", flexWrap:"wrap" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:"8px", flex:1, minWidth:"200px" }}>
+          <Search size={15} style={{ color:"rgba(167,139,250,0.45)", flexShrink:0 }}/>
+          <input type="text" placeholder="Search by name or ID..." value={search} onChange={e=>setSearch(e.target.value)}
+            style={inputS}
+            onFocus={e=>{e.target.style.borderColor="rgba(167,139,250,0.5)";e.target.style.background="rgba(167,139,250,0.08)";}}
+            onBlur={e=>{e.target.style.borderColor="rgba(167,139,250,0.2)";e.target.style.background="rgba(167,139,250,0.05)";}}
           />
         </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          <Filter size={14} className="text-slate-400" />
+        <div style={{ display:"flex", alignItems:"center", gap:"8px", flexWrap:"wrap" }}>
+          <Filter size={13} style={{ color:"rgba(167,139,250,0.4)" }}/>
           {[
-            { label: "State",  value: stateFilter,  setter: setStateFilter,  options: states   },
-            { label: "Status", value: statusFilter,  setter: setStatusFilter, options: statuses },
-            { label: "Type",   value: typeFilter,    setter: setTypeFilter,   options: types    },
+            { label:"State",  value:stateFilter,  setter:setStateFilter,  options:states   },
+            { label:"Status", value:statusFilter,  setter:setStatusFilter, options:statuses },
+            { label:"Type",   value:typeFilter,    setter:setTypeFilter,   options:types    },
           ].map(f => (
-            <div key={f.label} className="relative">
-              <select
-                value={f.value}
-                onChange={e => f.setter(e.target.value)}
-                className="appearance-none text-xs border border-slate-200 rounded-lg pl-3 pr-8 py-2 bg-slate-50 focus:outline-none cursor-pointer font-semibold text-slate-600"
-              >
-                {f.options.map(o => <option key={o} value={o}>{f.label}: {o}</option>)}
-              </select>
-              <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-            </div>
+            <select key={f.label} value={f.value} onChange={e=>f.setter(e.target.value)} style={selectS}>
+              {f.options.map(o => <option key={o} value={o} style={{background:"#0f0f24"}}>{f.label}: {o}</option>)}
+            </select>
           ))}
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 border-b border-slate-200">
+      <div style={{ ...card, overflow:"hidden" }}>
+        <div style={{ overflowX:"auto" }}>
+          <table style={{ width:"100%", borderCollapse:"collapse", fontSize:"12px" }}>
+            <thead style={{ background:"rgba(167,139,250,0.06)" }}>
               <tr>
-                {["Project ID", "Project Name", "State / District", "Type", "Progress", "Compensation", "Possession", "R&R", "Status", "Action"].map(h => (
-                  <th key={h} className="px-4 py-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                {["Project ID","Project Name","State / District","Type","Progress","Compensation","Possession","R&R","Status","Action"].map(h=>(
+                  <th key={h} style={{ padding:"11px 14px", textAlign:"left", fontSize:"9px", fontWeight:800, color:"rgba(167,139,250,0.55)", textTransform:"uppercase", letterSpacing:"0.1em", whiteSpace:"nowrap" }}>{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={10} className="px-4 py-12 text-center text-slate-400 font-semibold">
-                    No projects match the selected filters.
-                  </td>
-                </tr>
+            <tbody>
+              {filtered.length===0 ? (
+                <tr><td colSpan={10} style={{ padding:"48px", textAlign:"center", color:"rgba(167,139,250,0.4)", fontWeight:600 }}>No projects match the selected filters.</td></tr>
               ) : (
-                filtered.map(p => {
-                  const sc  = STATUS_COLORS[p.overallStatus] || STATUS_COLORS["On Track"];
-                  const tc  = TYPE_COLORS[p.type] || "bg-slate-100 text-slate-700";
+                filtered.map(p=>{
+                  const sc = STATUS_CFG[p.overallStatus] || STATUS_CFG["On Track"];
+                  const tc = TYPE_CFG[p.type] || { bg:"rgba(167,139,250,0.1)", text:"#a78bfa" };
                   const pct = p.progressPercentage;
                   return (
-                    <tr key={p.id} className="hover:bg-slate-50/60 transition-colors">
-                      <td className="px-4 py-3.5 font-mono text-[10px] font-bold text-slate-600 whitespace-nowrap">{p.shortName}</td>
-                      <td className="px-4 py-3.5 max-w-[200px]">
-                        <p className="font-bold text-slate-800 leading-snug truncate" title={p.name}>{p.name}</p>
-                        <p className="text-[10px] text-slate-400 mt-0.5 truncate">{p.requiringBody}</p>
+                    <tr key={p.id} style={{ borderTop:"1px solid rgba(167,139,250,0.07)", transition:"background 0.15s" }}
+                      onMouseEnter={e=>e.currentTarget.style.background="rgba(167,139,250,0.05)"}
+                      onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                      <td style={{ padding:"12px 14px", fontFamily:"monospace", fontSize:"10px", fontWeight:700, color:"rgba(167,139,250,0.7)", whiteSpace:"nowrap" }}>{p.shortName}</td>
+                      <td style={{ padding:"12px 14px", maxWidth:"200px" }}>
+                        <p style={{ fontWeight:700, color:"rgba(255,255,255,0.88)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }} title={p.name}>{p.name}</p>
+                        <p style={{ fontSize:"10px", color:"rgba(167,139,250,0.45)", marginTop:"2px" }}>{p.requiringBody}</p>
                       </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap">
-                        <p className="font-semibold text-slate-700">{p.state}</p>
-                        <p className="text-[10px] text-slate-400">{p.district}</p>
+                      <td style={{ padding:"12px 14px", whiteSpace:"nowrap" }}>
+                        <p style={{ fontWeight:600, color:"rgba(255,255,255,0.8)" }}>{p.state}</p>
+                        <p style={{ fontSize:"10px", color:"rgba(167,139,250,0.45)" }}>{p.district}</p>
                       </td>
-                      <td className="px-4 py-3.5">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${tc}`}>{p.type}</span>
+                      <td style={{ padding:"12px 14px" }}>
+                        <span style={{ background:tc.bg, color:tc.text, padding:"2px 10px", borderRadius:"99px", fontSize:"10px", fontWeight:700, border:`1px solid ${tc.text}30` }}>{p.type}</span>
                       </td>
-                      <td className="px-4 py-3.5 min-w-[110px]">
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${pct >= 80 ? "bg-emerald-500" : pct >= 50 ? "bg-sky-500" : "bg-amber-500"}`}
-                              style={{ width: `${pct}%` }}
-                            />
+                      <td style={{ padding:"12px 14px", minWidth:"110px" }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+                          <div style={{ flex:1, background:"rgba(167,139,250,0.1)", height:"5px", borderRadius:"99px", overflow:"hidden" }}>
+                            <div style={{ height:"100%", borderRadius:"99px", width:`${pct}%`, background: pct>=80?"#10b981":pct>=50?"#38bdf8":"#fbbf24" }}/>
                           </div>
-                          <span className="font-bold text-slate-700 shrink-0">{pct}%</span>
+                          <span style={{ fontWeight:700, color:"rgba(255,255,255,0.85)", flexShrink:0, fontSize:"11px" }}>{pct}%</span>
                         </div>
-                        <p className="text-[10px] text-slate-400 mt-0.5">{p.landAcquiredAcres} / {p.landProposedAcres || "—"} ac</p>
+                        <p style={{ fontSize:"10px", color:"rgba(167,139,250,0.45)", marginTop:"2px" }}>{p.landAcquiredAcres}/{p.landProposedAcres||"—"} ac</p>
                       </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap">
-                        <p className="font-bold text-slate-800">₹{p.compensationPaidCr} Cr</p>
-                        <p className="text-[10px] text-slate-400">of ₹{p.compensationAssessedCr} Cr</p>
+                      <td style={{ padding:"12px 14px", whiteSpace:"nowrap" }}>
+                        <p style={{ fontWeight:700, color:"rgba(255,255,255,0.85)" }}>₹{p.compensationPaidCr} Cr</p>
+                        <p style={{ fontSize:"10px", color:"rgba(167,139,250,0.45)" }}>of ₹{p.compensationAssessedCr} Cr</p>
                       </td>
-                      <td className="px-4 py-3.5">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                          p.lifecycleBreakdown.possession === 100 ? "bg-emerald-100 text-emerald-800" :
-                          p.lifecycleBreakdown.possession > 0   ? "bg-amber-100 text-amber-800" :
-                          "bg-slate-100 text-slate-600"
-                        }`}>
+                      <td style={{ padding:"12px 14px" }}>
+                        <span style={{ padding:"2px 10px", borderRadius:"99px", fontSize:"10px", fontWeight:700, background:p.lifecycleBreakdown.possession===100?"rgba(16,185,129,0.15)":p.lifecycleBreakdown.possession>0?"rgba(245,158,11,0.15)":"rgba(167,139,250,0.1)", color:p.lifecycleBreakdown.possession===100?"#34d399":p.lifecycleBreakdown.possession>0?"#fbbf24":"rgba(167,139,250,0.5)" }}>
                           {p.lifecycleBreakdown.possession}%
                         </span>
                       </td>
-                      <td className="px-4 py-3.5">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                          p.lifecycleBreakdown.rr === 100 ? "bg-emerald-100 text-emerald-800" :
-                          p.lifecycleBreakdown.rr > 0    ? "bg-amber-100 text-amber-800" :
-                          "bg-slate-100 text-slate-600"
-                        }`}>
+                      <td style={{ padding:"12px 14px" }}>
+                        <span style={{ padding:"2px 10px", borderRadius:"99px", fontSize:"10px", fontWeight:700, background:p.lifecycleBreakdown.rr===100?"rgba(16,185,129,0.15)":p.lifecycleBreakdown.rr>0?"rgba(245,158,11,0.15)":"rgba(167,139,250,0.1)", color:p.lifecycleBreakdown.rr===100?"#34d399":p.lifecycleBreakdown.rr>0?"#fbbf24":"rgba(167,139,250,0.5)" }}>
                           {p.rrCompletedCount}/{p.affectedFamiliesCount} fam.
                         </span>
                       </td>
-                      <td className="px-4 py-3.5">
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${sc.bg} ${sc.text} ${sc.border}`}>
+                      <td style={{ padding:"12px 14px" }}>
+                        <span style={{ padding:"3px 10px", borderRadius:"99px", fontSize:"10px", fontWeight:700, background:sc.bg, color:sc.text, border:`1px solid ${sc.border}` }}>
                           {p.overallStatus}
                         </span>
                       </td>
-                      <td className="px-4 py-3.5">
-                        <button
-                          onClick={() => onViewDetails(p.id)}
-                          className="flex items-center gap-1.5 bg-slate-900 hover:bg-blue-600 text-white font-bold px-3 py-1.5 rounded-lg cursor-pointer transition-all text-[10px] whitespace-nowrap"
-                        >
-                          <Eye size={12} /> View Details
+                      <td style={{ padding:"12px 14px" }}>
+                        <button onClick={()=>onViewDetails(p.id)}
+                          style={{ display:"flex", alignItems:"center", gap:"6px", background:"linear-gradient(135deg,#5b21b6,#7c3aed)", color:"white", fontWeight:700, padding:"6px 12px", borderRadius:"9px", border:"none", cursor:"pointer", fontSize:"10px", whiteSpace:"nowrap", boxShadow:"0 2px 10px rgba(124,58,237,0.35)", transition:"all 0.15s" }}
+                          onMouseEnter={e=>{e.currentTarget.style.boxShadow="0 4px 16px rgba(167,139,250,0.5)";e.currentTarget.style.transform="translateY(-1px)";}}
+                          onMouseLeave={e=>{e.currentTarget.style.boxShadow="0 2px 10px rgba(124,58,237,0.35)";e.currentTarget.style.transform="none";}}>
+                          <Eye size={11}/> View
                         </button>
                       </td>
                     </tr>
@@ -177,9 +157,7 @@ export default function ProjectList({ projects, onViewDetails, onAddProject }) {
             </tbody>
           </table>
         </div>
-
-        {/* Footer */}
-        <div className="px-4 py-3 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500 font-semibold bg-slate-50">
+        <div style={{ padding:"12px 18px", borderTop:"1px solid rgba(167,139,250,0.08)", display:"flex", justifyContent:"space-between", fontSize:"10px", color:"rgba(167,139,250,0.4)", fontWeight:600, background:"rgba(167,139,250,0.03)" }}>
           <span>{filtered.length} record(s) displayed</span>
           <span>Total National Projects: {projects.length}</span>
         </div>

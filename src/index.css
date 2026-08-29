@@ -1,56 +1,136 @@
 @import "tailwindcss";
 
-/* Custom Global Overrides & Leaflet Styling */
-@layer utilities {
-  /* Scrollbar overrides */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: #f1f5f9;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-  }
+/* ══════════════════════════════════════════════════
+   LACC – Black × Lavender Design System
+   ══════════════════════════════════════════════════ */
+:root {
+  --bg-base:      #05050f;
+  --bg-surface:   #0c0c1e;
+  --bg-elevated:  #111128;
+  --bg-card:      #0f0f24;
+  --lav-950:      #0a0618;
+  --lav-900:      #130e2e;
+  --lav-800:      #1e1040;
+  --lav-700:      #2d1568;
+  --lav-600:      #4c1d95;
+  --lav-500:      #7c3aed;
+  --lav-400:      #a78bfa;
+  --lav-300:      #c4b5fd;
+  --lav-200:      #ddd6fe;
+  --lav-100:      #ede9fe;
+  --border:       rgba(167, 139, 250, 0.15);
+  --border-hover: rgba(167, 139, 250, 0.35);
+  --glow-sm:      0 0 12px rgba(124, 58, 237, 0.25);
+  --glow-md:      0 0 24px rgba(124, 58, 237, 0.35);
+  --glow-lg:      0 0 48px rgba(124, 58, 237, 0.4);
+  --text-primary:  rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(196, 181, 253, 0.8);
+  --text-muted:   rgba(167, 139, 250, 0.5);
 }
 
-/* Custom scrollbar for dark elements */
-.dark-scrollbar::-webkit-scrollbar-track {
-  background: #0f172a;
-}
-.dark-scrollbar::-webkit-scrollbar-thumb {
-  background: #334155;
-}
-.dark-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+/* ── Base reset ─────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Inter', 'Outfit', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Leaflet dark theme map and coordinate layout */
+/* ── Scrollbars ─────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--lav-600), var(--lav-500));
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--lav-400); }
+
+.dark-scrollbar::-webkit-scrollbar-track { background: var(--bg-base); }
+.dark-scrollbar::-webkit-scrollbar-thumb { background: var(--lav-700); }
+.dark-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--lav-600); }
+
+/* ── Leaflet dark-lavender map ──────────────────── */
 .leaflet-container {
-  background: #0f172a !important;
-  border-radius: 0.5rem;
+  background: #09091a !important;
+  border-radius: 0.75rem;
 }
-
-/* Premium popups for Leaflet */
 .leaflet-popup-content-wrapper {
-  background: #1e293b !important;
-  color: #f8fafc !important;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0.5rem !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+  background: #11112a !important;
+  color: #e2e8f0 !important;
+  border: 1px solid rgba(167, 139, 250, 0.25);
+  border-radius: 12px !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), var(--glow-sm) !important;
+}
+.leaflet-popup-tip { background: #11112a !important; }
+.custom-leaflet-marker { background: transparent; border: none; }
+
+/* ── Global Animations ──────────────────────────── */
+@keyframes spin       { to { transform: rotate(360deg); } }
+@keyframes pulse      { 0%,100%{opacity:1} 50%{opacity:0.45} }
+@keyframes pulse-glow {
+  0%,100% { box-shadow: 0 0 8px rgba(124,58,237,0.4); }
+  50%     { box-shadow: 0 0 20px rgba(167,139,250,0.7); }
+}
+@keyframes float {
+  0%,100% { transform: translateY(0px);   }
+  50%     { transform: translateY(-8px);  }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+@keyframes slide-in-right {
+  from { opacity:0; transform:translateX(20px); }
+  to   { opacity:1; transform:translateX(0);    }
+}
+@keyframes fade-up {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0);    }
+}
+@keyframes orb-drift {
+  0%,100% { transform: translate(0,0) scale(1); }
+  33%     { transform: translate(30px,-20px) scale(1.05); }
+  66%     { transform: translate(-20px,15px) scale(0.97); }
 }
 
-.leaflet-popup-tip {
-  background: #1e293b !important;
+/* ── Utility classes ────────────────────────────── */
+.lav-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.lav-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4), var(--glow-sm);
+}
+.lav-btn {
+  background: linear-gradient(135deg, var(--lav-600), var(--lav-500));
+  border: none; border-radius: 12px; color: white;
+  font-weight: 700; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+  transition: all 0.2s;
+}
+.lav-btn:hover {
+  background: linear-gradient(135deg, var(--lav-500), var(--lav-400));
+  box-shadow: 0 4px 24px rgba(167,139,250,0.5);
+  transform: translateY(-1px);
 }
 
-/* Custom div icon marker for maps */
-.custom-leaflet-marker {
-  background: transparent;
-  border: none;
+/* ── Input dark styles ──────────────────────────── */
+.lav-input {
+  background: rgba(255,255,255,0.04) !important;
+  border: 1.5px solid var(--border) !important;
+  color: var(--text-primary) !important;
+  border-radius: 12px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.lav-input:focus {
+  border-color: var(--lav-400) !important;
+  box-shadow: 0 0 0 3px rgba(167,139,250,0.15) !important;
+  outline: none !important;
 }
